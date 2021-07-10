@@ -1,6 +1,6 @@
 CC=gcc
 
-CFLAGS=-Wall -Wextra -pedantic -fstack-protector-all -pedantic -ledit -std=c99
+CFLAGS=-Wall -Wextra -pedantic -fstack-protector-all -pedantic -ledit -lm -std=c99
 SANITY_FLAGS=-Wfloat-equal -Wshadow -Wpointer-arith
 
 SOURCE=clips.c mpc/mpc.c

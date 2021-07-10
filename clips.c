@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <editline/readline.h>
 #include <histedit.h>
-#include <string.h>
 
 #include "mpc/mpc.h"
 
@@ -11,6 +12,8 @@ long eval_op(long left, char* operator, long right) {
     if (strcmp(operator, "-") == 0) return left - right;
     if (strcmp(operator, "*") == 0) return left * right;
     if (strcmp(operator, "/") == 0) return left / right;
+    if (strcmp(operator, "%") == 0) return left % right;
+    if (strcmp(operator, "^") == 0) return pow(left, right);
     return 0;
 }
 
@@ -43,7 +46,7 @@ int main(int argc, char** argv) {
     mpca_lang(MPCA_LANG_DEFAULT, 
         "                                                           \
             number      : /-?[0-9]+/ ;                              \
-            operator    : '+' | '-' | '*' | '/' ;                   \
+            operator    : '+' | '-' | '*' | '/' | '%' | '^' ;      \
             expr        : <number> | '(' <operator> <expr>+ ')' ;   \
             clips       : /^/ <operator> <expr>+ /$/ ;              \
         ", 
