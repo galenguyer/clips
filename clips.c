@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,24 +57,31 @@ void lval_println(lval val) {
     putchar('\n');
 }
 
-long eval_op(long left, char* operator, long right) {
-    if (strcmp(operator, "+") == 0) return left + right;
-    if (strcmp(operator, "-") == 0) return left - right;
-    if (strcmp(operator, "*") == 0) return left * right;
-    if (strcmp(operator, "/") == 0) return left / right;
-    if (strcmp(operator, "%") == 0) return left % right;
-    if (strcmp(operator, "^") == 0) return pow(left, right);
-    return 0;
+lval eval_op(lval left, char* operator, lval right) {
+    if (left.err) return left;
+    if (right.err) return right;
+
+    if (strcmp(operator, "+") == 0) return lval_num(left.num + right.num);
+    if (strcmp(operator, "-") == 0) return lval_num(left.num - right.num);
+    if (strcmp(operator, "*") == 0) return lval_num(left.num * right.num);
+    if (strcmp(operator, "/") == 0) return right.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(left.num / right.num);
+    if (strcmp(operator, "%") == 0) return lval_num(left.num % right.num);
+    if (strcmp(operator, "^") == 0) return lval_num(pow(left.num, right.num));
+
+    return lval_err(LERR_BAD_OP);
 }
 
-long eval(mpc_ast_t* t) {
+lval eval(mpc_ast_t* t) {
     if (strstr(t->tag, "number")) {
-        return atoi(t->contents);
+        errno = 0;
+        long x = strtol(t->contents, NULL, 10);
+        return errno == ERANGE ? lval_err(LERR_BAD_NUM) : lval_num(x);
+
     }
 
     char* op = t->children[1]->contents;
 
-    long result = eval(t->children[2]);
+    lval result = eval(t->children[2]);
 
     int pos = 3;
     while (strstr(t->children[pos]->tag, "expr")) {
@@ -108,8 +116,8 @@ int main(int argc, char** argv) {
         mpc_result_t tree;
         if (mpc_parse("<stdin>", input, Clips, &tree)) {
             //mpc_ast_print(result.output);
-            long result = eval(tree.output);
-            printf("%li\n", result);
+            lval result = eval(tree.output);
+            lval_println(result);
             mpc_ast_delete(tree.output);
         } else {
             mpc_err_print(tree.error);
