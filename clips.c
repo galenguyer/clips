@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <editline/readline.h>
 #include <histedit.h>
+
+#include "mpc/mpc.h"
 
 int main(int argc, char** argv) {
     puts("clips!");
