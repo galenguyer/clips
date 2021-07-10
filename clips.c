@@ -2,8 +2,34 @@
 #include <stdlib.h>
 #include <editline/readline.h>
 #include <histedit.h>
+#include <string.h>
 
 #include "mpc/mpc.h"
+
+long eval_op(long left, char* operator, long right) {
+    if (strcmp(operator, "+") == 0) return left + right;
+    if (strcmp(operator, "-") == 0) return left - right;
+    if (strcmp(operator, "*") == 0) return left * right;
+    if (strcmp(operator, "/") == 0) return left / right;
+    return 0;
+}
+
+long eval(mpc_ast_t* t) {
+    if (strstr(t->tag, "number")) {
+        return atoi(t->contents);
+    }
+
+    char* op = t->children[1]->contents;
+
+    long result = eval(t->children[2]);
+
+    int pos = 3;
+    while (strstr(t->children[pos]->tag, "expr")) {
+        result = eval_op(result, op, eval(t->children[pos]));
+        pos++;
+    }
+    return result;
+}
 
 int main(int argc, char** argv) {
     puts("clips!");
@@ -27,13 +53,15 @@ int main(int argc, char** argv) {
         char* input = readline("clips> ");
         add_history(input);
 
-        mpc_result_t result;
-        if (mpc_parse("<stdin>", input, Clips, &result)) {
-            mpc_ast_print(result.output);
-            mpc_ast_delete(result.output);
+        mpc_result_t tree;
+        if (mpc_parse("<stdin>", input, Clips, &tree)) {
+            //mpc_ast_print(result.output);
+            long result = eval(tree.output);
+            printf("%li\n", result);
+            mpc_ast_delete(tree.output);
         } else {
-            mpc_err_print(result.error);
-            mpc_err_delete(result.error);
+            mpc_err_print(tree.error);
+            mpc_err_delete(tree.error);
         }
 
         free(input);
