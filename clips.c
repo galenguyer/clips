@@ -52,13 +52,13 @@ int main(int argc, char** argv) {
     mpc_parser_t* Expr = mpc_new("expr");
     mpc_parser_t* Clips = mpc_new("clips");
 
-    mpca_lang(MPCA_LANG_DEFAULT, 
+    mpca_lang(MPCA_LANG_DEFAULT,
         "                                                           \
             number      : /-?[0-9]+/ ;                              \
             operator    : '+' | '-' | '*' | '/' | '%' | '^' ;      \
             expr        : <number> | '(' <operator> <expr>+ ')' ;   \
             clips       : /^/ <operator> <expr>+ /$/ ;              \
-        ", 
+        ",
         Number, Operator, Expr, Clips);
 
     while (1) {
