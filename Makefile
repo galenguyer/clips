@@ -9,7 +9,7 @@ OUTPUT=clips
 
 ALL: $(OUTPUT)
 
-debug: CFLAGS += -g -O0
+debug: CFLAGS += -g -O0 -fsanitize=address
 debug: $(OUTPUT)
 
 release: CFLAGS += -static -O3

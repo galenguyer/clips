@@ -1,19 +1,33 @@
 #ifndef __LVAL
 #define __LVAL
-typedef struct {
+#include "mpc/mpc.h"
+
+typedef struct lval {
+    int type;
+    // LVAL_ERR
+    char* err;
+    // LVAL_NUM
     long num;
-    int err;
+    // LVAL_SYM
+    char* sym;
+    // LVAL_SEXPR
+    int count;
+    struct lval** cells;
 } lval;
 
 enum {
-    LNOERR,
-    LERR_DIV_ZERO,
-    LERR_BAD_OP,
-    LERR_BAD_NUM
+    LVAL_ERR,
+    LVAL_NUM,
+    LVAL_SYM,
+    LVAL_SEXPR
 };
 
-lval lval_num(long num);
-lval lval_err(int x);
-void lval_print(lval val);
-void lval_println(lval val);
+lval* lval_read(mpc_ast_t* ast);
+lval* lval_num(long num);
+lval* lval_err(char* err);
+lval* lval_sym(char* sym);
+lval* lval_sexpr();
+void lval_del(lval* val);
+void lval_print(lval* val);
+void lval_println(lval* val);
 #endif
