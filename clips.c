@@ -28,7 +28,6 @@ lval eval(mpc_ast_t* t) {
         errno = 0;
         long x = strtol(t->contents, NULL, 10);
         return errno == ERANGE ? lval_err(LERR_BAD_NUM) : lval_num(x);
-
     }
 
     char* op = t->children[1]->contents;
@@ -63,6 +62,10 @@ int main(int argc, char** argv) {
 
     while (1) {
         char* input = readline("clips> ");
+        if (input == NULL) {
+            printf("\n");
+            break;
+        }
         add_history(input);
 
         mpc_result_t tree;
